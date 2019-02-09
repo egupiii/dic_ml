@@ -20,8 +20,8 @@ class ScratchLinearRegression():
     lr: float
         Learning rate
 
-    no_bias: bool
-        True if not input the bias term
+    bias: bool
+        True if input the bias term
 
     verbose: bool
         True if output the learning process
@@ -53,8 +53,8 @@ class ScratchLinearRegression():
 
     def fit(self, X, y, X_val=None, y_val=None):
         """
-        Fit linear regression. In a case of inputting validation dataset, return loss and accuracy of
-        the data per iteration.
+        Fit linear regression. In a case of inputting validation dataset, return the loss and the accuracy of
+        datasets per iteration.
 
         Parameters
         ----------
@@ -151,6 +151,7 @@ class ScratchLinearRegression():
             Results of the prediction by using linear regression
         """
 
+        # Add a bias if self.bias is True
         if self.bias == True:
             X_bias = np.array([1 for _ in range(X.shape[1])])
             X = np.vstack((X_bias, X))
@@ -159,12 +160,12 @@ class ScratchLinearRegression():
         ###print("predict-2, X=",X.shape)
 
         # Predict train dataset
-        y_pred = np.dot(self.coef_.T, X.T)  # (1,2) * (2,293)
+        y_pred = self._linear_hypothesis(X.T)  # (1,2) * (2,293)
 
         return y_pred
 
 
-    # Create a definition of hypothesis function of lunear regression
+    # Create a definition of hypothesis function of linear regression
     def _linear_hypothesis(self, X):
         """
         Return hypothesis function of linear regression
@@ -181,7 +182,7 @@ class ScratchLinearRegression():
         """
 
         # Compute the hypothesis function
-        y_pred = np.dot(self.coef_.T, X)  # (1,2) * (2,1168)
+        y_pred = np.dot(self.coef_.T, X)   # (1,2) * (2,1168)
         ###print("_linear_hypothesis-1, y_pred=",y_pred.shape)   # (1,1168)
 
         return y_pred
@@ -264,7 +265,7 @@ class ScratchLinearRegression():
         """
 
         # Predict train dataset
-        y_pred = np.dot(self.coef_.T, X)  # (1,2) * (2,1168)
+        y_pred = self._linear_hypothesis(X)  # (1,2) * (2,1168)
         ###print("_gradient_decsent-1, y_pred=",y_pred.shape)  # (1,1168)
 
         ###print("_gradient_decsent-1, y=",y.shape)   # (1,1168)
