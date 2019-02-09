@@ -1,51 +1,9 @@
-import argparse
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+#%matplotlib inline
+from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-
-
-
-# Set command-line arguments
-parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
-                                 description='linear regression pipeline')
-
-parser.add_argument('--dataset')
-parser.add_argument('--model',default="lr",type=str)
-
-
-
-# Create a definition of a regression pipeline
-def implement_regression_pipeline(args):
-    # Get datasets
-    df = pd.read_csv(args.dataset)
-    X = df.iloc[:, :-1].values
-    y = df.iloc[:, -1].values
-
-
-    # Split train and test datasets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.8)
-
-
-    if args.model == "lr":
-        # Initialize a class
-        slr = ScratchLinearRegression(num_iter=200, lr=0.1, bias=True, verbose=True)
-
-        # Fit the model according to the given training data
-        slr.fit(X_train, y_train)
-
-        # Predict class labels for samples in X_test
-        y_pred = slr.predict(X_test)
-
-        # Returns the mean accuracy on the given test data and labels
-        mse = slr.MSE(y_pred, y_test)
-
-    else:
-        print("Your model, {} did not work on this definition.".format(args.model))
-
-
-    # Return the results
-    print("y_pred is {}".format(y_pred))
-    print("MSE is {}".format(mse))
 
 
 
@@ -113,18 +71,68 @@ class ScratchLinearRegression():
             Correct values of validation dataset
         """
 
-        # Set hypothesis function
-        y = self._linear_hypothesis(X)
+        ###print("fit-1, X=",X.shape)   # (1168,2)
+        ###print("fit-2, y=",y.shape)   # (1168,)
+        ###print("fit-101, X_val=",X_val.shape)   # (292,2)
+        ###print("fit-102, y_val=",y_val.shape)   # (292,)
 
-        # Get lists of logs of MSE and theta
+        # Change the vectors to a matrix
+        y = y.reshape(len(y), 1)
+        if y_val is not None:
+            y_val = y_val.reshape(len(y_val), 1)
+
+        # Add a bias if self.bias is True
+        if self.bias == True:
+            # Create arrays of biases
+            X_bias = np.array([1 for _ in range(X.shape[1])])
+            y_bias = np.array([1 for _ in range(y.shape[1])])
+            ###print("fit-3, X_bias=",X_bias.shape)   # (1168,)
+            ###print("fit-4, y_bias=",y_bias.shape)   # (1168,)
+            # Add the biases
+            X = np.vstack((X_bias, X))
+            y = np.vstack((y_bias, y))
+
+        # Transform dataframes to move their features to rows
+        X = X.T
+        y = y.T
+        if (X_val is not None) and (y_val is not None):
+            X_val = X_val.T
+            y_val = y_val.T
+
+        ###print("fit-5, X=",X.shape)   # (2,1168)
+        ###print("fit-6, y=",y.shape)   # (1,1168)
+        ###if (X_val is not None) and (y_val is not None):
+        ###print("fit-103, X_val=",X_val.shape)   # (2,292)
+        ###print("fit-104, y_val=",y_val.shape)   # (1,292)
+
+        # Set a hypothesis parameter randomly and transform it
+        self.coef_ = np.random.randn(X.shape[0])
+        self.coef_ = self.coef_.reshape(len(self.coef_), 1)
+        ###print("fit-7, self.coef_=",self.coef_.shape)   # (2,1)
+
+        # Update the theta and get loss of train dataset
         for i in range(self.iter):
-            # Get the mean square error and the updated theta
-            mse = self._gradient_descent(X, y)
+            # Update the parameter
+            self.coef_ = self._gradient_descent(X, y)
+            ###print("fit-8, self.coef_=",self.coef_.shape)   # (2,1)
+            # Compute the mean square mean
+            mse = self._compute_cost(X, y)
+            ###print("fit-9, mse=",mse.shape)   # ()
             # Record the errors
             self.loss[i] = mse
-            # Return the log of losses if let verbose True
+            # Return the loss if verbose is True
             if self.verbose:
-                print(self.loss)
+                print(self.loss[i])
+
+            # Get loss of validation datasets
+            if (X_val is not None) and (y_val is not None):
+                # Get the mean square error
+                val_mse = self._compute_cost(X_val, y_val)
+                # Record the errors
+                self.val_loss[i] = val_mse
+                # Return the loss if verbose is True
+                if self.verbose:
+                    print(self.val_loss[i])
 
 
     def predict(self, X):
@@ -143,8 +151,15 @@ class ScratchLinearRegression():
             Results of the prediction by using linear regression
         """
 
-        # Predict a train dataset
-        y_pred = np.dot(X, self.coef_)
+        if self.bias == True:
+            X_bias = np.array([1 for _ in range(X.shape[1])])
+            X = np.vstack((X_bias, X))
+
+        ###print("predict-1, self.coef_=",self.coef_.shape)
+        ###print("predict-2, X=",X.shape)
+
+        # Predict train dataset
+        y_pred = np.dot(self.coef_.T, X.T)  # (1,2) * (2,293)
 
         return y_pred
 
@@ -165,13 +180,36 @@ class ScratchLinearRegression():
             Results of the prediction by hypothesis function of linear regression
         """
 
-        # Set a first theta
-        self.coef_ = np.random.randint(X.shape[1])
-
         # Compute the hypothesis function
-        y = np.dot(X, self.coef_)
+        y_pred = np.dot(self.coef_.T, X)  # (1,2) * (2,1168)
+        ###print("_linear_hypothesis-1, y_pred=",y_pred.shape)   # (1,1168)
 
-        return y
+        return y_pred
+
+
+    # Create a definition to compute the mean square error
+    def _compute_cost(self, X, y):
+        """
+        Compute the mean square error. Import the "MSE" definition.
+
+        Parameters
+        ----------
+        X: ndarray whose shape is (n_samples,n_features)
+            train dataset
+
+        y: ndarray whose shape is (n_samples,1)
+            correct value
+
+
+        Returns
+        ----------
+        ndarray whose shape is (1,)
+            mean square error
+        """
+
+        y_pred = self._linear_hypothesis(X)
+
+        return self.MSE(y_pred, y)
 
 
     # Create a definition of the mean square error
@@ -196,14 +234,13 @@ class ScratchLinearRegression():
 
         # Compute an error
         error = y_pred - y
+        ###print("MSE-1, error=",error.shape)   # (1,1168)
 
         # Sum errors
-        sum_errors = (error ** 2).sum()
+        sum_errors = np.sum(error ** 2)
 
-        # Compute the mean square error devided by 2
-        mse = sum_errors / (2 * len(y))
-
-        return mse
+        # Return the mean square error devided by 2
+        return sum_errors / (2 * y.shape[1])
 
 
     # Create a definition to fit datasets by steepest descent method
@@ -224,31 +261,35 @@ class ScratchLinearRegression():
         ----------
         ndarray whose shape is (1,)
             parameter(weight)
-
         """
 
-        # Predict a train dataset
-        y_pred = np.dot(X, self.coef_)
+        # Predict train dataset
+        y_pred = np.dot(self.coef_.T, X)  # (1,2) * (2,1168)
+        ###print("_gradient_decsent-1, y_pred=",y_pred.shape)  # (1,1168)
 
-        # Compute the mean square error
-        mse = self.MSE(y_pred, y)
+        ###print("_gradient_decsent-1, y=",y.shape)   # (1,1168)
 
-        # Compute the error
-        error = y_pred - y
+        # Compute the error and the mean square error
+        error = y_pred - y  # (1,1168)
+        ###print("_gradient_decsent-2, error=",error.shape)   # (1,1168)
 
         # Compute the gradient
-        grad = np.dot(error.T, X)
+        grad = np.dot(X, error.T)  # (2,1168) * (1168,1)
+        ###print("_gradient_decsent-3, grad=",grad.shape)   # (2,1)
 
-        # Update the theta
-        self.coef_ -= self.lr * grad / len(y)
-
-        return mse
-
+        # Update the parameter
+        return self.coef_ - self.lr * grad / y.shape[1]
 
 
-if __name__ == "__main__":
-    # Be run here at first when running the py file
+    # Plot learning records
+    def plot_learning_record(self):
+        plt.plot(self.loss, label="loss")
+        plt.plot(self.val_loss, label="val_loss")
 
-    # Import command-line arguments
-    args = parser.parse_args()
-    implement_regression_pipeline(args)
+        plt.title("Learning Records")
+        plt.xlabel("Number of Iterrations")
+        plt.ylabel("Loss")
+        plt.grid(True)
+
+        plt.legend()
+        plt.show()
