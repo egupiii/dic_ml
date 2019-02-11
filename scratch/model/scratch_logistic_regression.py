@@ -2,7 +2,6 @@ import math
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-%matplotlib inline
 from matplotlib.colors import ListedColormap
 import matplotlib.patches as mpatches
 from sklearn.preprocessing import StandardScaler
@@ -506,7 +505,7 @@ class ScratchLogisticRegression():
         plt.ylabel(ylabel)
         plt.contourf(mesh_f0, mesh_f1, pred, n_class - 1, cmap=ListedColormap(contourf_color))
         plt.contour(mesh_f0, mesh_f1, pred, n_class - 1, colors='y', linewidths=3, alpha=0.5)
-        for i, target in enumerate(set(y_train)):
+        for i, target in enumerate(set(y)):
             plt.scatter(X[y == target][:, 0], X[y == target][:, 1], s=80, color=scatter_color[i], label=target_names[i],
                         marker='o')
         patches = [mpatches.Patch(color=scatter_color[i], label=target_names[i]) for i in range(n_class)]
