@@ -53,7 +53,7 @@ class ScratchSVMClassifier():
 
     def fit(self, X, y, X_val=None, y_val=None):
         """
-        Fit SVM. In a case of inputting validation dataset, return loss and accuracy of the data per iteration.
+        Fit datasets by SVM.
 
         Parameters
         ----------
