@@ -61,7 +61,6 @@ class ScratchKMeans():
                 break
             else:
                 self.centroids = temporary_centroids
-        #                 print("iter:",i)
 
         # Compute the SSE
         return np.sum(np.square(cluster_table))

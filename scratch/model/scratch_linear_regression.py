@@ -70,11 +70,6 @@ class ScratchLinearRegression():
             Correct values of validation dataset
         """
 
-        ###print("fit-1, X=",X.shape)   # (1168,2)
-        ###print("fit-2, y=",y.shape)   # (1168,)
-        ###print("fit-101, X_val=",X_val.shape)   # (292,2)
-        ###print("fit-102, y_val=",y_val.shape)   # (292,)
-
         # Change the vectors to a matrix
         y = y.reshape(len(y), 1)
         if y_val is not None:
@@ -85,8 +80,6 @@ class ScratchLinearRegression():
             # Create arrays of biases
             X_bias = np.array([1 for _ in range(X.shape[1])])
             y_bias = np.array([1 for _ in range(y.shape[1])])
-            ###print("fit-3, X_bias=",X_bias.shape)   # (1168,)
-            ###print("fit-4, y_bias=",y_bias.shape)   # (1168,)
             # Add the biases
             X = np.vstack((X_bias, X))
             y = np.vstack((y_bias, y))
@@ -98,25 +91,16 @@ class ScratchLinearRegression():
             X_val = X_val.T
             y_val = y_val.T
 
-        ###print("fit-5, X=",X.shape)   # (2,1168)
-        ###print("fit-6, y=",y.shape)   # (1,1168)
-        ###if (X_val is not None) and (y_val is not None):
-        ###print("fit-103, X_val=",X_val.shape)   # (2,292)
-        ###print("fit-104, y_val=",y_val.shape)   # (1,292)
-
         # Set a hypothesis parameter randomly and transform it
         self.coef_ = np.random.randn(X.shape[0])
         self.coef_ = self.coef_.reshape(len(self.coef_), 1)
-        ###print("fit-7, self.coef_=",self.coef_.shape)   # (2,1)
 
         # Update the theta and get loss of train dataset
         for i in range(self.iter):
             # Update the parameter
             self.coef_ = self._gradient_descent(X, y)
-            ###print("fit-8, self.coef_=",self.coef_.shape)   # (2,1)
             # Compute the mean square mean
             mse = self._compute_cost(X, y)
-            ###print("fit-9, mse=",mse.shape)   # ()
             # Record the errors
             self.loss[i] = mse
             # Return the loss if verbose is True
@@ -155,11 +139,8 @@ class ScratchLinearRegression():
             X_bias = np.array([1 for _ in range(X.shape[1])])
             X = np.vstack((X_bias, X))
 
-        ###print("predict-1, self.coef_=",self.coef_.shape)
-        ###print("predict-2, X=",X.shape)
-
         # Predict train dataset
-        y_pred = self._linear_hypothesis(X.T)  # (1,2) * (2,293)
+        y_pred = self._linear_hypothesis(X.T)
 
         return y_pred
 
@@ -181,8 +162,7 @@ class ScratchLinearRegression():
         """
 
         # Compute the hypothesis function
-        y_pred = np.dot(self.coef_.T, X)   # (1,2) * (2,1168)
-        ###print("_linear_hypothesis-1, y_pred=",y_pred.shape)   # (1,1168)
+        y_pred = np.dot(self.coef_.T, X)
 
         return y_pred
 
@@ -234,7 +214,6 @@ class ScratchLinearRegression():
 
         # Compute an error
         error = y_pred - y
-        ###print("MSE-1, error=",error.shape)   # (1,1168)
 
         # Sum errors
         sum_errors = np.sum(error ** 2)
@@ -264,18 +243,13 @@ class ScratchLinearRegression():
         """
 
         # Predict train dataset
-        y_pred = self._linear_hypothesis(X)  # (1,2) * (2,1168)
-        ###print("_gradient_decsent-1, y_pred=",y_pred.shape)  # (1,1168)
-
-        ###print("_gradient_decsent-1, y=",y.shape)   # (1,1168)
+        y_pred = self._linear_hypothesis(X)
 
         # Compute the error and the mean square error
-        error = y_pred - y  # (1,1168)
-        ###print("_gradient_decsent-2, error=",error.shape)   # (1,1168)
+        error = y_pred - y
 
         # Compute the gradient
-        grad = np.dot(X, error.T)  # (2,1168) * (1168,1)
-        ###print("_gradient_decsent-3, grad=",grad.shape)   # (2,1)
+        grad = np.dot(X, error.T)
 
         # Update the parameter
         return self.coef_ - self.lr * grad / y.shape[1]

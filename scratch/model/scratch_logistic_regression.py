@@ -83,11 +83,6 @@ class ScratchLogisticRegression():
             Correct values of validation dataset
         """
 
-        ###print("fit-1, X=",X.shape)   # (80,2)
-        ###print("fit-2, y=",y.shape)   # (80,)
-        ###print("fit-101, X_val=",X_val.shape)   # (20,2)
-        ###print("fit-102, y_val=",y_val.shape)   # (20,)
-
         # Change objective vectors to matrixes
         y = y.reshape(len(y), 1)
         if (X_val is not None) and (y_val is not None):
@@ -104,8 +99,6 @@ class ScratchLogisticRegression():
             X_bias = X_bias.reshape(len(X_bias), 1)
             if (X_val is not None) and (y_val is not None):
                 X_val_bias = X_val_bias.reshape(len(X_val_bias), 1)
-            ###print("fit-3, X_bias=",X_bias.shape)   # (80,1)
-            ###print("fit-4, X_val_bias=",X_val_bias.shape)   # (20,1)
 
             # Add the biases
             X = np.hstack((X_bias, X))
@@ -137,28 +130,19 @@ class ScratchLogisticRegression():
         if (X_val is not None) and (y_val is not None):
             X_val = X_val.T
 
-        ###print("fit-5, X=",X.shape)   # (3,80)
-        ###print("fit-6, y=",y.shape)   # (1,80)
-        ###if (X_val is not None) and (y_val is not None):
-        ###print("fit-103, X_val=",X_val.shape)   # (3,20)
-        ###print("fit-104, y_val=",y_val.shape)   # (1,20)
-
         # Set a hypothesis parameter randomly and transform it
         self.coef_ = np.random.randn(X.shape[0])
 
         # Change the vector to a matrix
         self.coef_ = self.coef_.reshape(len(self.coef_), 1)
-        ###print("fit-7, self.coef_=",self.coef_.shape)   # (3,1)
 
         # Update the parameter and get loss of train dataset
         for i in range(self.iter):
             # Update the parameter
             self.coef_ = self._gradient_descent(X, y)
-            ###print("fit-8, self.coef_=",self.coef_.shape)   # (3,1)
 
             # Compute the cross entropy
             cross_entropy = self._compute_cost(X, y)
-            ###print("fit-9, cross_entropy=",cross_entropy.shape)   # ()
 
             # Record the errors
             self.loss[i] = cross_entropy
@@ -225,8 +209,6 @@ class ScratchLogisticRegression():
             Probability of
         """
 
-        ###print("predict_proba-1, X=",X.shape)   # (20,2)
-
         # Add a bias if self.bias is True
         if self.bias == True:
             # Create arrays of biases
@@ -238,11 +220,8 @@ class ScratchLogisticRegression():
             # Add the biases
             X = np.hstack((X_bias, X))
 
-        ###print("predict_proba-2, self.coef_=",self.coef_.shape)   # (3,1)
-        ###print("predict_proba-3, X=",X.shape)   # (20,3)
-
         # Predict train dataset
-        y_pred = self._linear_hypothesis(X.T)  # (1,3) * (3,20)
+        y_pred = self._linear_hypothesis(X.T)
 
         return y_pred
 
@@ -284,11 +263,10 @@ class ScratchLogisticRegression():
         """
 
         # Compute an index of linear hypothesis
-        z = np.dot(self.coef_.T, X)  # (1,3) * (3,80)
+        z = np.dot(self.coef_.T, X)
 
         # Compute the hypothesis function
         y_pred = self._sigmoid_function(z)
-        ###print("_linear_hypothesis-1, y_pred=",y_pred.shape)   # (1,80) <-> (1,20)
 
         return y_pred
 
@@ -338,8 +316,6 @@ class ScratchLogisticRegression():
             cross entropy
         """
 
-        ###print("cross_entropy-1, y_pred=",y_pred.shape)   # (1,80) <-> (1,20)
-
         # Compute a probability that equals to 1
         prob1 = -y * np.log(y_pred)
 
@@ -381,24 +357,18 @@ class ScratchLogisticRegression():
 
         # Predict train dataset
         y_pred = self._linear_hypothesis(X)
-        ###print("_gradient_decsent-1, y_pred=",y_pred.shape)  # (1,80)
-
-        ###print("_gradient_decsent-2, y=",y.shape)   # (1,80)
 
         # Compute the error
         error = y_pred - y
-        ###print("_gradient_decsent-3, error=",error.shape)   # (1,80)
 
         # Compute the gradient
-        grad = np.dot(X, error.T)  # (3,80) * (80,1)
-        ###print("_gradient_decsent-4, grad=",grad.shape)   # (3,1)
+        grad = np.dot(X, error.T)
 
         # Sum gradients
         sum_grads = np.sum(grad)
 
         # Compute the regularization term
         reg_term = self.reg / y.shape[1] * self.coef_
-        ###print("_gradient_descent-5, reg_term=",reg_term)
 
         # Update the parameter
         if self.bias == False:
@@ -406,7 +376,6 @@ class ScratchLogisticRegression():
         else:
             # Change the (1,1) element to 0
             reg_term[0, 0] = 0
-            ###print("_gradient_descent-6, reg_term=",reg_term)
             return self.coef_ - self.lr * (grad / y.shape[1] + reg_term)
 
 
@@ -446,12 +415,6 @@ class ScratchLogisticRegression():
 
         # Change values of y to only 2 kinds of values, 0 and 1
         y = [1 if i == max(y) else 0 for i in y]
-
-        ###print("compute_index_values-1, y_pred=", y_pred)
-        ###print("compute_index_values-2, y=", y)
-
-        ###print("compute_index_values-3, y_pred=", len(y_pred))   # 20
-        ###print("compute_index_values-4, y=", len(y))   # 20
 
         # Return index values
         print("accuracy score: ", accuracy_score(y, y_pred))
