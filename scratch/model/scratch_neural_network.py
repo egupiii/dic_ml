@@ -199,8 +199,7 @@ class ScratchSimpleNeuralNetrowkClassifier():
 
             
             else:
-                for ((mini_X_train, mini_y_train), (mini_X_val_train, mini_y_val_train)) in zip(get_mini_batch,
-                                                                                                get_mini_batch_val):
+                for mini_X_train, mini_y_train in get_mini_batch:
                     # Forwardpropagation
                     # 1st layer
                     # Processing of the layer
