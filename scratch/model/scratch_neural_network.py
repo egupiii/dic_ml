@@ -4,10 +4,6 @@ import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-# from sklearn.metrics import precision_score
-# from sklearn.metrics import recall_score
-# from sklearn.metrics import f1_score
-# from sklearn.metrics import confusion_matrix
 
 
 
@@ -91,9 +87,12 @@ class ScratchSimpleNeuralNetrowkClassifier():
         bp = Backpropagation()
 
         # Get an initial values
-        self.W1, self.B1 = fp.weight_bias(n_features, n_nodes1, sigma)
-        self.W2, self.B2 = fp.weight_bias(n_nodes1, n_nodes2, sigma)
-        self.W3, self.B3 = fp.weight_bias(n_nodes2, n_output, sigma)
+        self.W1 = sigma * np.random.randn(n_features, n_nodes1)
+        self.B1 = sigma * np.random.randn(n_nodes1)[np.newaxis, :]
+        self.W2 = sigma * np.random.randn(n_nodes1, n_nodes2)
+        self.B2 = sigma * np.random.randn(n_nodes2)[np.newaxis, :]
+        self.W3 = sigma * np.random.randn(n_nodes2, n_output)
+        self.B3 = sigma * np.random.randn(n_output)[np.newaxis, :]
 
 
     def fit(self, X, y, X_val=None, y_val=None):
@@ -332,12 +331,6 @@ class ScratchSimpleNeuralNetrowkClassifier():
         # Return index values
         print("accuracy score:", accuracy_score(y, y_pred))
 
-    #         print("precision score:", precision_score(y, y_pred))
-    #         print("recall score:", recall_score(y, y_pred))
-    #         print("f1 score:", precision_score(y, y_pred))
-    #         print("confusion matrix:")
-    #         print(confusion_matrix(y, y_pred))
-
 
     def plot_misclassification(self, X_val, y_val, y_pred):
         """
@@ -434,17 +427,6 @@ class Forwardpropagation():
     """
     Forwardpropagation method
     """
-
-    def weight_bias(self, n_features, n_nodes, sigma=0.01):
-        """
-        Get a weight and a bias.
-        """
-
-        W = sigma * np.random.randn(n_features, n_nodes)
-        B = sigma * np.random.randn(n_nodes)[np.newaxis, :]
-
-        return W, B
-
 
     def layer_processing(self, X, W, B):
         """
