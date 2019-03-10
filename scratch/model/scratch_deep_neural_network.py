@@ -135,7 +135,7 @@ class ScratchDeepNeuralNetrowkClassifier:
                 self.loss += [sum(L) / self.batch_size]
                 if (X_val is not None) and (y_val is not None):
                     self.val_loss += [sum(L_val) / self.batch_size]
-                    print("{0}th loss: {1}, val_loss: {2}".format(count + 1, self.loss[count], self.val_loss[count]))
+                    print("{0}ep loss: {1}, val_loss: {2}".format(count + 1, self.loss[count], self.val_loss[count]))
                 else:
                     print(self.loss[count])
                 count += 1
