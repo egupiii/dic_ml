@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                  description='classification pipeline')
 
 parser.add_argument('--dataset')
-parser.add_argument('--model',default="lr",type=str)
+parser.add_argument('--model',default="log_reg",type=str)
 
 
 
@@ -26,7 +26,7 @@ def implement_classification_pipeline(args):
     # Split train and test datasets
     X_train, X_test, y_train, y_test = train_test_split(X,y,train_size=0.8)
     
-    if args.model=="lr":
+    if args.model=="log_reg":
         y_pred, score = logistic_regression(X_train,X_test,y_train,y_test)
     elif args.model=="svm":
         y_pred, score = support_vector_machine(X_train,X_test,y_train,y_test)
@@ -44,13 +44,13 @@ def implement_classification_pipeline(args):
 # Create a definition of logistic regression
 def logistic_regression(X_train,X_test,y_train,y_test):
     # Initialize a classifier
-    lr = LogisticRegression(random_state=0,solver='lbfgs',multi_class='multinomial')
+    log_reg = LogisticRegression(random_state=0,solver='lbfgs',multi_class='multinomial')
     # Fit the model according to the given training data
-    lr.fit(X_train,y_train)
+    log_reg.fit(X_train,y_train)
     # Predict class labels for samples in X_test
-    y_pred = lr.predict(X_test)
+    y_pred = log_reg.predict(X_test)
     # Returns the mean accuracy on the given test data and labels
-    score = lr.score(X_test,y_test)
+    score = log_reg.score(X_test,y_test)
     
     return y_pred,score
 
