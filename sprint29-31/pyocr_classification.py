@@ -1,7 +1,8 @@
+import sys
 import cv2
 import pyocr
 import pyocr.builders
-# from PIL import Image
+from PIL import Image
 
 
 """
@@ -29,42 +30,45 @@ for string in list_str:
 
 
 # def classify_products(input_path):
-def classify_products(img):
+def classify_products(imgArray):
     # Image to text
     tools = pyocr.get_available_tools()
     if len(tools) == 0:
-        return None
+        sys.exit(1)
     tool = tools[0]
 
+    # Original image
     txt = tool.image_to_string(
 #         Image.open(input_path),
-        img,
+        Image.fromarray(numpy.uint8(imgArray)),
         lang="jpn+eng",
         builder=pyocr.builders.TextBuilder(tesseract_layout=6)
     )
 
     # Change the texts to a list of each character
-    results_pyocr = list(txt)
+    results_pyocr = []
+    results_pyocr.append(list(txt))
+    results_pyocr = [x for x in results_pyocr[0] if x]
+    
+    if len(results_pyocr) == 0:
+        return None
 
     # Count key words and return indix of the label
     count_key_words = []
     for i in range(len(key_words)):
         total = 0
-        for result in results_pyocr:
+        for result in results_pyocr[0]:
             if result in key_words[i]:
                 total += 1
         count_key_words.append(total)
     index = [i for i, x in enumerate(count_key_words) if x == max(count_key_words)]
     
     # Output index
-    if len(index)==1:
-        return index[0]
+    if len(index) == 1:
+        ratio = count_key_words[index[0]]/sum(count_key_words)
+        if ratio >= 0.5:
+            return index[0]
+        else:
+            return None
     else:
-        ratio_of_detected_key_words = count_key_words[index[0]]/len(key_words[index[0]])
-        final_index = index[0]
-        for i, ind in enumerate(index):
-            ratio = count_key_words[index[ind]]/len(key_words[index[ind]])
-            if ratio > ratio_of_detected_key_words:
-                ratio_of_detected_key_words = ratio
-                final_index = index[i]
-        return final_index
+        return None
