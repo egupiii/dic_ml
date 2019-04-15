@@ -43,8 +43,8 @@ class classify_products:
         # Original image
         txt = tool.image_to_string(
 #             Image.open(input_path),
-#             Image.fromarray(imgArray),
-            Image.fromarray(imgArray[0]),
+            Image.fromarray(imgArray),
+#             Image.fromarray(imgArray[0]),
             lang="jpn+eng",
             builder=pyocr.builders.TextBuilder(tesseract_layout=6)
         )
