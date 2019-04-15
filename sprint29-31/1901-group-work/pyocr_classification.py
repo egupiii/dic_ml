@@ -43,7 +43,6 @@ class classify_products:
         # Original image
         txt = tool.image_to_string(
 #             Image.open(input_path),
-#             Image.fromarray(imgArray),
             Image.fromarray(imgArray[0]),
             lang="jpn+eng",
             builder=pyocr.builders.TextBuilder(tesseract_layout=6)
@@ -55,7 +54,10 @@ class classify_products:
         results_pyocr = [x for x in results_pyocr[0] if x]
 
         if len(results_pyocr) == 0:
-            return None, results_pyocr
+            return None
+
+        print("OCR Detect!!")
+        print("words {}".format(results_pyocr))
 
         # Count key words and return indix of the label
         count_key_words = []
@@ -72,8 +74,8 @@ class classify_products:
         if len(index) == 1:
             ratio = count_key_words[index[0]]/sum(count_key_words)
             if ratio >= 0.5:
-                return index[0], results_pyocr
+                return index[0]
             else:
-                return None, results_pyocr
+                return None
         else:
-            return None, results_pyocr
+            return None
